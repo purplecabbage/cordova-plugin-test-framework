@@ -18,6 +18,8 @@
  * under the License.
  *
 */
+/* jshint node: true */
+/* global jasmineRequire, document */
 
 'use strict';
 
@@ -62,21 +64,41 @@ exports.setUpJasmine = function() {
     };
 
     return jasmineInterface;
-}
+};
 
 function addJasmineReporters(jasmineInterface, jasmineEnv) {
-    jasmineInterface.jsApiReporter = new jasmineInterface.jasmine.JsApiReporter({ timer: new jasmineInterface.jasmine.Timer() });
+
+    var Timer = jasmineInterface.jasmine.Timer;
+
+    jasmineInterface.jsApiReporter = new jasmineInterface.jasmine.JsApiReporter({ timer: new Timer() });
     jasmineEnv.addReporter(jasmineInterface.jsApiReporter);
+
+    var consoleReptOptions = {  timer: new Timer() };
+    consoleReptOptions.print =  function () {
+                                    console.log.apply(console,arguments);
+                                };
+
+    var ConsoleReporter = new jasmineInterface.jasmine.ConsoleReporter(consoleReptOptions);
+    jasmineEnv.addReporter(ConsoleReporter);
 
     jasmineInterface.htmlReporter = new jasmineInterface.jasmine.HtmlReporter({
         env: jasmineEnv,
-        queryString: function() { return null; },
+        queryString: function() {
+            return null;
+        },
         onRaiseExceptionsClick: function() { },
-        getContainer: function() { return document.getElementById('content'); },
-        createElement: function() { return document.createElement.apply(document, arguments); },
-        createTextNode: function() { return document.createTextNode.apply(document, arguments); },
-        timer: new jasmineInterface.jasmine.Timer()
+        getContainer: function() {
+            return document.getElementById('content');
+        },
+        createElement: function() {
+            return document.createElement.apply(document, arguments);
+        },
+        createTextNode: function() {
+            return document.createTextNode.apply(document, arguments);
+        },
+        timer: new Timer()
     });
+
     jasmineInterface.htmlReporter.initialize();
     jasmineEnv.addReporter(jasmineInterface.htmlReporter);
 
